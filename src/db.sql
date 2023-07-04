@@ -29,7 +29,7 @@ create table
 insert into
     platos (
         title,
-        `imageUrl`,
+        imageUrl,
         description,
         precio
     )
@@ -106,3 +106,7 @@ values
         'Seleccion de las mejores Verduras de estacion asadas a su mejor punto. un deleite',
         2500
     )
+
+;
+
+select
