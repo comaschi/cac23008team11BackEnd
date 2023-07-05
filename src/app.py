@@ -5,10 +5,13 @@ from flaskext.mysql import MySQL
 
 
 app = Flask(__name__)
-app.config['MYSQL_DATABASE_HOST'] = '192.168.1.229'
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'diego'
-app.config['MYSQL_DATABASE_DB'] = 'cac23008team11'
+# app.config['MYSQL_DATABASE_HOST'] = '192.168.1.229'
+# app.config['MYSQL_DATABASE_USER'] = 'root'
+# app.config['MYSQL_DATABASE_PASSWORD'] = 'diego'
+app.config['MYSQL_DATABASE_HOST'] = 'comaschi.mysql.pythonanywhere-services.com'
+app.config['MYSQL_DATABASE_USER'] = 'comaschi'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'diego100'
+app.config['MYSQL_DATABASE_DB'] = 'comaschi$cac23008team11'
 
 mysql = MySQL()
 mysql.init_app(app)
@@ -138,37 +141,35 @@ def viewPedidos(pedidoId):
 # Si el pedido UUID no existe se crea el plato (INSERT)
 # si el pedido existe y el plato no se agrega un plato al pedido (INSERT)
 # si existe el pedido y el plato se cambia la cantidad (CHANGE)
-
-
 @app.route('/pedidos', methods=["POST"])
 def addPedido():
 
     if request.method == 'POST':
         try:
-            _uuid = request.json['uuid']
-            _platoId = request.json['platoId']
-            _cantidad = request.json['cantidad']
+          _uuid = request.json['uuid']
+          _platoId = request.json['platoId']
+          _cantidad = request.json['cantidad']
 
-            conn = mysql.connect()
-            cursor = conn.cursor(cursor=DictCursor)
+          conn = mysql.connect()
+          cursor = conn.cursor(cursor=DictCursor)
 
-            sql = "select * from pedidos a where a.uuid = %s and a.platoId = %s"
-            cursor.execute(sql, (_uuid, _platoId))
+          sql = "select * from pedidos a where a.uuid = %s and a.platoId = %s"
+          cursor.execute(sql, (_uuid, _platoId))
 
-            msg = ''
-            if cursor.rowcount > 0:
-                sql = "update pedidos set cantidad = %s where  uuid = %s and platoId = %s"
-                cursor.execute(sql, (_cantidad, _uuid, _platoId))
-                msg = "{'message': 'Pedido Cambiado'}"
-            else:
-                sql = "insert into pedidos ( uuId,  platoId, cantidad, time) values (%s,%s,%s, current_timestamp)"
-                cursor.execute(sql, (_uuid, _platoId, _cantidad))
-                msg = "{'message': 'Pedido creado'}"
+          msg = ''
+          if cursor.rowcount > 0:
+              sql = "update pedidos set cantidad = %s where  uuid = %s and platoId = %s"
+              cursor.execute(sql, (_cantidad, _uuid, _platoId))
+              msg = "{'message': 'Pedido Cambiado'}"
+          else:
+              sql = "insert into pedidos ( uuId,  platoId, cantidad, time) values (%s,%s,%s, current_timestamp)"
+              cursor.execute(sql, (_uuid, _platoId, _cantidad))
+              msg = "{'message': 'Pedido creado'}"
 
-            conn.commit()
-            cursor.close()
-            conn.close()
-            return jsonify(msg), 200
+          conn.commit()
+          cursor.close()
+          conn.close()
+          return jsonify(msg), 200
         except:
             return jsonify({'error': 'Error al crear pedido'}), 500
 
